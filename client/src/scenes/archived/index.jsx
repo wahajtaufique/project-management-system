@@ -6,7 +6,7 @@ import { tokens } from "../../theme";
 import SortIcon from '@mui/icons-material/Sort';
 import SearchIcon from "@mui/icons-material/Search";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getProjects } from "../../store/actions";
 
 const Archived = () => {
@@ -17,13 +17,12 @@ const Archived = () => {
   const [sort, setSort] = useState("asc");
   const dispatch = useDispatch();
   const myApp = useSelector(state => state.myApp);
-  const [projects, setProjects] = useState([]);
+  const projects = useMemo(() => myApp.projects.projectsData, [myApp.projects.projectsData])
 
   useEffect(() => {
     dispatch(getProjects({
       filter: "archived"
     }))
-    setProjects([]);
   }, [])
 
   const handleSearch = () => {
@@ -53,11 +52,6 @@ const Archived = () => {
       }))
     }
   }
-
-  useEffect(() => {
-    setProjects(myApp.projects.projectsData)
-  }, [myApp.projects.projectsData])
-
 
   return (
     <Box m="20px">
@@ -89,13 +83,13 @@ const Archived = () => {
           <Grid item xs={9} md={6} lg={4}>
             <ProjectCard
               key={idx}
-              id={project._id}
-              title={project.projectName}
-              description={project.description}
-              repo={project.repo}
-              live={project.live}
-              image={project.image}
-              startDate={new Date(project.startDate).toLocaleString()}
+              id={project?._id}
+              title={project?.projectName}
+              description={project?.description}
+              repo={project?.repo}
+              live={project?.live}
+              image={project?.image}
+              startDate={new Date(project?.startDate).toLocaleString()}
             />
           </Grid>
         ))}

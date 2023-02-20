@@ -21,6 +21,11 @@ const projectSchema = new Schema(
 			type: String,
 			required: true,
 		},
+		userId: {
+			type: mongoose.Types.ObjectId,
+			ref: "user",
+			required: true
+		},
 		repo: {
 			type: String,
 		},

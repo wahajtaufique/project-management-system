@@ -6,7 +6,7 @@ import { tokens } from "../../theme";
 import SortIcon from '@mui/icons-material/Sort';
 import SearchIcon from "@mui/icons-material/Search";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getProjects } from "../../store/actions";
 
 const InProgress = () => {
@@ -17,19 +17,13 @@ const InProgress = () => {
   const [sort, setSort] = useState("asc");
   const dispatch = useDispatch();
   const myApp = useSelector(state => state.myApp);
-  const [projects, setProjects] = useState([]);
+  const projects = useMemo(() => myApp.projects.projectsData, [myApp.projects.projectsData])
 
   useEffect(() => {
     dispatch(getProjects({
       filter: "in-progress"
     }))
   }, [])
-
-  useEffect(() => {
-    if (myApp.projects.projectsData.length > 0) {
-      setProjects(myApp.projects.projectsData)
-    }
-  }, [myApp.projects.projectsData])
 
   const handleSearch = () => {
     dispatch(getProjects({
@@ -86,17 +80,17 @@ const InProgress = () => {
         </Box>
       </Box>
       <Grid container display="flex" spacing={2} style={{marginTop: "20px"}}>
-        {projects.map((project) => (
+        {projects.map((project, idx) => (
           <Grid item xs={9} md={6} lg={4}>
             <ProjectCard
               key={idx}
-              id={project._id} 
-              title={project.projectName} 
-              description={project.description}
-              repo={project.repo}
-              live={project.live}
-              image={project.image} 
-              startDate={new Date(project.startDate).toLocaleString()}
+              id={project?._id} 
+              title={project?.projectName} 
+              description={project?.description}
+              repo={project?.repo}
+              live={project?.live}
+              image={project?.image} 
+              startDate={new Date(project?.startDate).toLocaleString()}
               editable={true} 
             />
           </Grid>

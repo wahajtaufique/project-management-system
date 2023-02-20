@@ -5,7 +5,7 @@ exports.addProject = async (req, res) => {
 	try {
         const {projectName, description, image, tags } = req.body;
 
-		const hasProject = await Project.findOne({ projectName });
+		const hasProject = await Project.findOne({ projectName, userId: req.user._id });
 
 		if (hasProject) {
 			return res.status(200).json({
@@ -20,6 +20,7 @@ exports.addProject = async (req, res) => {
 
 		const project = new Project({
 			projectName, description, startDate, image, tags, keywords,
+			userId: req.user._id,
 			...(req.body.repo && { repo: req.body.repo }),
 			...(req.body.live && { live: req.body.live }),
 		});
@@ -72,7 +73,8 @@ exports.getProjects = async (req, res) => {
 
 		const projects = await Project.find({ 
 			...(keyword && { keywords: { $regex: keyword, $options: "i" } }),
-			...query
+			...query,
+			userId: req.user._id
 		}).sort({ projectName: sort });
 
 		if (projects.length === 0) {
@@ -129,21 +131,24 @@ exports.updateProject = async (req, res) => {
 exports.getStats = async (req, res) => {
 	try {
 		const completed = await Project.find({
-			status: "completed"
+			status: "completed",
+			userId: req.user._id
 		}).countDocuments();
 
 		const inProgress = await Project.find({
-			status: "in-progress"
+			status: "in-progress",
+			userId: req.user._id
 		}).countDocuments();
 
 		const archived = await Project.find({
-			archived: true
+			archived: true,
+			userId: req.user._id
 		}).countDocuments();
 	
 		return res.status(200).json({
 			message: "Projects stats fetched successfully",
 			status: true,
-			stats: { inProgress, archived, completed, total: inProgress + archived + completed }
+			stats: { inProgress, archived, completed, total: inProgress + completed }
 		});
 
 	} catch (error) {
